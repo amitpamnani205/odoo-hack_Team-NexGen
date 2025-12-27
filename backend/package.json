@@ -13,7 +13,7 @@
     "tracker",
     "odoo"
   ],
-  "author": "",
+  "author": "Team NexGen",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
