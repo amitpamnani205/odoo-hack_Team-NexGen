@@ -36,8 +36,17 @@ const Navbar = () => {
       <Link to="/reports" className={`nav-item ${isActive('/reports')}`}>
         Reporting
       </Link>
-      <Link to="/teams" className={`nav-item ${isActive('/teams')}`}>
-        Team
+      <Link to="/teams" className={`nav-item ${isActive('/teams') && !location.pathname.startsWith('/skill-teams') ? 'active' : ''}`}>
+        Maintenance Teams
+      </Link>
+      <Link to="/skills" className={`nav-item ${isActive('/skills')}`}>
+        Skills
+      </Link>
+      <Link to="/matches" className={`nav-item ${isActive('/matches')}`}>
+        Matches
+      </Link>
+      <Link to="/skill-teams" className={`nav-item ${isActive('/skill-teams')}`}>
+        Skill Teams
       </Link>
       {user && (
         <div className="nav-user">

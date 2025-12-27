@@ -9,6 +9,13 @@
   --border-color: #e0e4f0;
   --accent-cyan: #54D1F1;
   --white: #FFFFFF;
+  /* Additional variables from myFrontend for compatibility */
+  --primary: #7066F0;
+  --purple: #7066F0;
+  --cyan: #54D1F1;
+  --soft-bg: #F7F7FF;
+  --soft: #F7F7FF;
+  --text: #4D4D4D;
 }
 
 * {

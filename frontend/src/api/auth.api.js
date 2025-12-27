@@ -53,5 +53,16 @@ export const signup = async (name, email, password) => {
   }
 }
 
+export const resetPassword = async (email) => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500))
+  
+  // Mock password reset
+  return {
+    success: true,
+    message: 'Reset link sent (demo)'
+  }
+}
+
 export default api
 
