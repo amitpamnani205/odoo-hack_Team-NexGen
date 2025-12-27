@@ -1,0 +1,272 @@
+.content {
+  padding: 30px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.table-header {
+  padding: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-grid-inline {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px;
+  background: #fafbfc;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  border: 1px solid #eee;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.card-red {
+  background: #fff0f3;
+  border-color: #ffdce3;
+}
+
+.card-red .card-icon {
+  background: #ffccd5;
+  color: #d63384;
+}
+
+.card-blue {
+  background: #f0f4ff;
+  border-color: #dbe4ff;
+}
+
+.card-blue .card-icon {
+  background: #dbe4ff;
+  color: #437ec6;
+}
+
+.card-green {
+  background: #f1fcf4;
+  border-color: #d3f9d8;
+}
+
+.card-green .card-icon {
+  background: #d3f9d8;
+  color: #39ae4e;
+}
+
+.card-info h3 {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.card-info .value {
+  font-size: 24px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.card-red .value {
+  color: #d63384;
+}
+
+.card-blue .value {
+  color: #437ec6;
+}
+
+.card-green .value {
+  color: #39ae4e;
+}
+
+.btn-new {
+  background: var(--primary-purple);
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-new:hover {
+  background: #6b5ce6;
+}
+
+.search-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0 12px;
+}
+
+.search-bar input {
+  border: none;
+  padding: 10px;
+  width: 100%;
+  outline: none;
+  font-size: 14px;
+}
+
+.search-dropdown {
+  padding-left: 10px;
+  border-left: 1px solid #eee;
+  color: #999;
+}
+
+.btn-filter {
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 16px 20px;
+  font-size: 13px;
+  color: #888;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.data-table td {
+  padding: 16px 20px;
+  font-size: 14px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.type-repair,
+.type-corrective {
+  color: #d63384;
+  font-weight: 600;
+}
+
+.type-install {
+  color: #0d6efd;
+  font-weight: 600;
+}
+
+.type-checkup,
+.type-preventive {
+  color: #333;
+  font-weight: 600;
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-pending {
+  background: #e6fcf5;
+  color: #0ca678;
+}
+
+.badge-progress {
+  background: #e7f5ff;
+  color: #1971c2;
+}
+
+.badge-completed {
+  background: #ebfbee;
+  color: #2b8a3e;
+}
+
+.badge-priority {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.badge-priority.high {
+  background: #fff9db;
+  color: #f08c00;
+}
+
+.badge-priority.medium {
+  background: #e6fcf5;
+  color: #0ca678;
+}
+
+.badge-priority.low {
+  background: #e3fafc;
+  color: #0b7285;
+}
+
+.table-footer {
+  padding: 12px 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #eee;
+  background: #f8f9fa;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+}
+
+.page-info {
+  font-size: 13px;
+  color: #666;
+}
+
