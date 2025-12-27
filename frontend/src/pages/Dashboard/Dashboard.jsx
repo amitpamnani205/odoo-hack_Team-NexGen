@@ -6,9 +6,9 @@ import './Dashboard.css'
 const Dashboard = () => {
   const navigate = useNavigate()
   const [stats, setStats] = useState({
-    new: 12,
-    inProgress: 10,
-    completed: 20
+    totalEquipment: 0,
+    openRequests: 0,
+    scrapped: 0,
   })
   const [requests, setRequests] = useState([])
   const [loading, setLoading] = useState(true)
@@ -19,15 +19,24 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      const response = await maintenanceAPI.getMaintenanceRequests()
-      // Backend wraps data as { success, message, data: [...] }
-      const raw = Array.isArray(response?.data?.data)
-        ? response.data.data
-        : Array.isArray(response?.data)
-          ? response.data
+      const [equipmentRes, openReqRes] = await Promise.all([
+        maintenanceAPI.getMaintenanceRequests({}),
+        maintenanceAPI.getMaintenanceRequests({ stage: 'new' })
+      ])
+
+      const equipRaw = Array.isArray(equipmentRes?.data?.data)
+        ? equipmentRes.data.data
+        : Array.isArray(equipmentRes?.data)
+          ? equipmentRes.data
           : []
 
-      const normalized = raw.map((r) => ({
+      const openRaw = Array.isArray(openReqRes?.data?.data)
+        ? openReqRes.data.data
+        : Array.isArray(openReqRes?.data)
+          ? openReqRes.data
+          : []
+
+      const normalized = openRaw.map((r) => ({
         ...r,
         completionType: r.completionType || r.requestType,
         assignedTo: r.assignedTo || r.assignedTechnicianId,
@@ -35,16 +44,15 @@ const Dashboard = () => {
       }))
 
       setRequests(normalized.slice(0, 4))
-      
-      // Calculate stats
-      const newCount = normalized.filter(r => r.stage === 'new').length
-      const inProgressCount = normalized.filter(r => r.stage === 'in_progress').length
-      const completedCount = normalized.filter(r => r.stage === 'repaired').length
-      
+
+      const totalEquipment = equipRaw.length
+      const scrappedCount = equipRaw.filter((e) => e.isScrapped).length
+      const openCount = openRaw.length
+
       setStats({
-        new: newCount,
-        inProgress: inProgressCount,
-        completed: completedCount
+        totalEquipment,
+        openRequests: openCount,
+        scrapped: scrappedCount,
       })
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
@@ -93,36 +101,42 @@ const Dashboard = () => {
             <div className="card card-red">
               <div className="card-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M9.5 9.5l5 5m0-5l-5 5" stroke="currentColor" strokeWidth="2" />
                 </svg>
               </div>
               <div className="card-info">
-                <h3>New Request</h3>
-                <div className="value">{stats.new}</div>
+                <h3>Total Equipment</h3>
+                <div className="value">{stats.totalEquipment}</div>
+                <div className="subtext">All assets in the system</div>
               </div>
             </div>
 
             <div className="card card-blue">
               <div className="card-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M8 15h8M8 12h6M8 9h4" stroke="currentColor" strokeWidth="2" />
                 </svg>
               </div>
               <div className="card-info">
-                <h3>In Progress</h3>
-                <div className="value">{stats.inProgress}</div>
+                <h3>Open Requests</h3>
+                <div className="value">{stats.openRequests}</div>
+                <div className="subtext">New maintenance tickets</div>
               </div>
             </div>
 
             <div className="card card-green">
               <div className="card-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
+                  <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" fill="none" />
+                  <circle cx="12" cy="12" r="9" />
                 </svg>
               </div>
               <div className="card-info">
-                <h3>Completed</h3>
-                <div className="value">{stats.completed}</div>
+                <h3>Scrapped</h3>
+                <div className="value">{stats.scrapped}</div>
+                <div className="subtext">Marked unusable</div>
               </div>
             </div>
           </div>

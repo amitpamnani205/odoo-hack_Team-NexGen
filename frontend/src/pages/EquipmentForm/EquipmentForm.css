@@ -13,15 +13,28 @@
 .form-card {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 22px rgba(36, 44, 90, 0.08);
   padding: 30px;
   border: 1px solid #eee;
 }
 
-.form-card h1 {
+.form-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.form-header h1 {
   font-size: 24px;
-  color: var(--primary-purple);
-  margin-bottom: 24px;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.form-header .muted {
+  color: var(--text-muted);
+  margin-top: 6px;
+  font-size: 14px;
 }
 
 .form-grid {
@@ -65,9 +78,10 @@
   border-color: var(--primary-purple);
 }
 
-.form-group input[type="checkbox"] {
-  width: auto;
-  cursor: pointer;
+.form-group .inline {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 10px;
 }
 
 .form-actions {
@@ -112,6 +126,35 @@
 .btn-save:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.readonly-note {
+  padding: 10px;
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  background: #f9fafc;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.success-message {
+  color: #0f8a47;
+  font-size: 14px;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: #e8f5ed;
+  border-radius: 4px;
+  border: 1px solid #b7e2c6;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: #f8d7da;
+  border-radius: 4px;
+  border: 1px solid #f1aeb5;
 }
 
 @media (max-width: 768px) {

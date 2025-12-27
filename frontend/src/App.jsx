@@ -9,6 +9,7 @@ import EquipmentForm from './pages/EquipmentForm/EquipmentForm'
 import EquipmentCategories from './pages/EquipmentCategories/EquipmentCategories'
 import WorkCenterList from './pages/WorkCenterList/WorkCenterList'
 import WorkCenterForm from './pages/WorkCenterForm/WorkCenterForm'
+import EquipmentHome from './pages/EquipmentHome/EquipmentHome'
 import MaintenanceKanban from './pages/MaintenanceKanban/MaintenanceKanban'
 import MaintenanceRequestForm from './pages/MaintenanceRequestForm/MaintenanceRequestForm'
 import MaintenanceCalendar from './pages/MaintenanceCalendar/MaintenanceCalendar'
@@ -29,6 +30,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/equipment-home" element={<EquipmentHome />} />
         <Route path="/equipment" element={<EquipmentList />} />
         <Route path="/equipment/new" element={<EquipmentForm />} />
         <Route path="/equipment/:id" element={<EquipmentForm />} />

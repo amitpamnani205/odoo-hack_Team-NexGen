@@ -1,20 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --primary-purple: #7c69ef;
-  --header-bg: #8e7cf3;
-  --bg-light: #f5f6fb;
-  --text-main: #333;
-  --text-muted: #666;
-  --border-color: #e0e4f0;
-  --accent-cyan: #54D1F1;
-  --white: #FFFFFF;
-  /* Additional variables from myFrontend for compatibility */
-  --primary: #7066F0;
-  --purple: #7066F0;
-  --cyan: #54D1F1;
-  --soft-bg: #F7F7FF;
-  --soft: #F7F7FF;
+  --primary-purple: #4f46e5; /* brand accent */
+  --primary-purple-strong: #4338ca;
+  --header-bg: #5a55f5;
+  --bg-light: #f6f7ff;
+  --bg-gradient: linear-gradient(135deg, #f6f7ff 0%, #eef2ff 100%);
+  --text-main: #1f2430;
+  --text-muted: #6b7287;
+  --border-color: #e3e6f2;
+  --accent-cyan: #5fd4ff;
+  --white: #ffffff;
+  --card-shadow: 0 8px 24px rgba(36, 44, 90, 0.08);
+  --radius: 14px;
+  /* Additional variables kept for compatibility */
+  --primary: #5a55f5;
+  --purple: #5a55f5;
+  --cyan: #5fd4ff;
+  --soft-bg: #f0f3ff;
+  --soft: #f0f3ff;
   --text: #4D4D4D;
 }
 
@@ -26,9 +30,10 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: var(--bg-light);
+  background: var(--bg-gradient);
   color: var(--text-main);
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 #root {

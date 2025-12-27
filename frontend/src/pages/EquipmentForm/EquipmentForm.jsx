@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as equipmentAPI from '../../api/equipment.api'
+import * as workCenterAPI from '../../api/workcenter.api'
 import EquipmentSmartButton from '../../components/EquipmentSmartButton'
 import './EquipmentForm.css'
 
@@ -10,31 +11,29 @@ const EquipmentForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     serialNumber: '',
-    asset: false,
     category: '',
     company: '',
-    usedBy: '',
-    maintenanceTeam: 'Internal Maintenance',
+    assignedToType: 'employee',
+    assignedTo: '',
+    defaultTechnicianId: '',
+    location: '',
+    workCenter: '',
     assignedDate: new Date().toISOString().split('T')[0],
-    description: '',
-    trackingNumber: '',
-    technician: '',
-    employee: '',
     scrapDate: '',
-    usedInLocation: '',
-    workContact: '',
-    purchaseDate: '',
-    warrantyInfo: '',
-    location: ''
+    description: ''
   })
   const [categories, setCategories] = useState([])
+  const [workCenters, setWorkCenters] = useState([])
   const [loading, setLoading] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
 
   useEffect(() => {
     if (id) {
       fetchEquipment()
     }
     fetchCategories()
+    fetchWorkCenters()
   }, [id])
 
   const fetchEquipment = async () => {
@@ -43,7 +42,18 @@ const EquipmentForm = () => {
       const data = response?.data?.data || response?.data || {}
       setFormData(prev => ({
         ...prev,
-        ...data
+        name: data.name || '',
+        serialNumber: data.serialNumber || '',
+        category: data.categoryId || data.category?._id || '',
+        company: data.company || '',
+        assignedToType: data.assignedToType || 'employee',
+        assignedTo: data.assignedToId || data.assignedTo || '',
+        defaultTechnicianId: data.defaultTechnicianId || '',
+        location: data.location || '',
+        workCenter: data.workCenter || '',
+        assignedDate: data.assignedDate ? data.assignedDate.split('T')[0] : prev.assignedDate,
+        scrapDate: data.scrapDate ? data.scrapDate.split('T')[0] : '',
+        description: data.description || ''
       }))
     } catch (error) {
       console.error('Error fetching equipment:', error)
@@ -59,6 +69,15 @@ const EquipmentForm = () => {
     }
   }
 
+  const fetchWorkCenters = async () => {
+    try {
+      const response = await workCenterAPI.getWorkCenters()
+      setWorkCenters(response.data || [])
+    } catch (error) {
+      console.error('Error fetching work centers:', error)
+    }
+  }
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
     setFormData(prev => ({
@@ -69,17 +88,40 @@ const EquipmentForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setErrorMsg('')
+    setSuccessMsg('')
     setLoading(true)
     try {
-      if (id) {
-        await equipmentAPI.updateEquipment(id, formData)
-      } else {
-        await equipmentAPI.createEquipment(formData)
+      const payload = {
+        name: formData.name,
+        serialNumber: formData.serialNumber,
+        description: formData.description,
+        categoryId: formData.category,
+        assignedToType: formData.assignedToType,
+        assignedToId: formData.assignedTo,
+        defaultTechnicianId: formData.defaultTechnicianId || null,
+        company: formData.company,
+        location: formData.location,
+        workCenter: formData.workCenter,
+        assignedDate: formData.assignedDate,
+        scrapDate: formData.scrapDate || null,
       }
+
+      if (id) {
+        await equipmentAPI.updateEquipment(id, payload)
+      } else {
+        await equipmentAPI.createEquipment(payload)
+      }
+      setSuccessMsg('Equipment saved successfully')
       navigate('/equipment')
     } catch (error) {
       console.error('Error saving equipment:', error)
-      alert('Error saving equipment')
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        'Error saving equipment'
+      setErrorMsg(message)
     } finally {
       setLoading(false)
     }
@@ -89,25 +131,31 @@ const EquipmentForm = () => {
     <div className="equipment-form-container">
       <div className="content">
         <div className="form-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h1 style={{ margin: 0 }}>{id ? 'Edit Equipment' : 'New Equipment'}</h1>
+          <div className="form-header">
+            <div>
+              <h1>{id ? 'Edit Equipment' : 'New Equipment'}</h1>
+              <p className="muted">Maintenance team will auto-assign from category.</p>
+            </div>
             {id && <EquipmentSmartButton equipmentId={id} />}
           </div>
+          {errorMsg && <div className="error-message">{errorMsg}</div>}
+          {successMsg && <div className="success-message">{successMsg}</div>}
           <form onSubmit={handleSubmit}>
             <div className="form-grid">
               <div className="form-column">
                 <div className="form-group">
-                  <label>Asset?</label>
+                  <label>Name</label>
                   <input
-                    type="checkbox"
-                    name="asset"
-                    checked={formData.asset}
+                    type="text"
+                    name="name"
+                    value={formData.name}
                     onChange={handleChange}
+                    required
                   />
                 </div>
                 <div className="form-group">
-                  <label>Equipment Category?</label>
-                  <select name="category" value={formData.category} onChange={handleChange}>
+                  <label>Equipment Category</label>
+                  <select name="category" value={formData.category} onChange={handleChange} required>
                     <option value="">Select Category</option>
                     {categories.map(cat => (
                       <option key={cat._id || cat.id} value={cat._id || cat.id}>
@@ -117,7 +165,7 @@ const EquipmentForm = () => {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Company?</label>
+                  <label>Company</label>
                   <input
                     type="text"
                     name="company"
@@ -126,25 +174,27 @@ const EquipmentForm = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Used By?</label>
-                  <input
-                    type="text"
-                    name="usedBy"
-                    value={formData.usedBy}
-                    onChange={handleChange}
-                  />
+                  <label>Assigned To</label>
+                  <div className="inline">
+                    <select name="assignedToType" value={formData.assignedToType} onChange={handleChange}>
+                      <option value="employee">Employee</option>
+                      <option value="department">Department</option>
+                    </select>
+                    <input
+                      type="text"
+                      name="assignedTo"
+                      value={formData.assignedTo}
+                      onChange={handleChange}
+                      placeholder="Name or ID"
+                    />
+                  </div>
                 </div>
                 <div className="form-group">
                   <label>Maintenance Team</label>
-                  <input
-                    type="text"
-                    name="maintenanceTeam"
-                    value={formData.maintenanceTeam}
-                    onChange={handleChange}
-                  />
+                  <div className="readonly-note">Auto-assigned from category</div>
                 </div>
                 <div className="form-group">
-                  <label>Assigned Date?</label>
+                  <label>Assigned Date</label>
                   <input
                     type="date"
                     name="assignedDate"
@@ -164,53 +214,27 @@ const EquipmentForm = () => {
               </div>
               <div className="form-column">
                 <div className="form-group">
-                  <label>Equipment Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Tracking Number ID</label>
-                  <input
-                    type="text"
-                    name="trackingNumber"
-                    value={formData.trackingNumber}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
                   <label>Serial Number</label>
                   <input
                     type="text"
                     name="serialNumber"
                     value={formData.serialNumber}
                     onChange={handleChange}
+                    required
                   />
                 </div>
                 <div className="form-group">
-                  <label>Technician?</label>
+                  <label>Technician</label>
                   <input
                     type="text"
-                    name="technician"
-                    value={formData.technician}
+                    name="defaultTechnicianId"
+                    value={formData.defaultTechnicianId}
                     onChange={handleChange}
+                    placeholder="Technician name or ID"
                   />
                 </div>
                 <div className="form-group">
-                  <label>Employee?</label>
-                  <input
-                    type="text"
-                    name="employee"
-                    value={formData.employee}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Scrap Date?</label>
+                  <label>Scrap Date</label>
                   <input
                     type="date"
                     name="scrapDate"
@@ -219,49 +243,24 @@ const EquipmentForm = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Used in location?</label>
-                  <input
-                    type="text"
-                    name="usedInLocation"
-                    value={formData.usedInLocation}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Work Contact</label>
-                  <input
-                    type="text"
-                    name="workContact"
-                    value={formData.workContact}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Purchase Date</label>
-                  <input
-                    type="date"
-                    name="purchaseDate"
-                    value={formData.purchaseDate}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Warranty Information</label>
-                  <input
-                    type="text"
-                    name="warrantyInfo"
-                    value={formData.warrantyInfo}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Location</label>
+                  <label>Used in location</label>
                   <input
                     type="text"
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
                   />
+                </div>
+                <div className="form-group">
+                  <label>Work Center</label>
+                  <select name="workCenter" value={formData.workCenter} onChange={handleChange}>
+                    <option value="">Select Work Center</option>
+                    {workCenters.map(wc => (
+                      <option key={wc._id || wc.id} value={wc.name || wc._id || wc.id}>
+                        {wc.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>

@@ -20,7 +20,7 @@ const Navbar = () => {
 
   return (
     <nav className="sub-nav">
-      <Link to="/dashboard" className={`nav-item ${isActive('/dashboard')}`}>
+      <Link to="/maintenance" className={`nav-item ${isActive('/maintenance')}`}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
           <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -33,20 +33,14 @@ const Navbar = () => {
       <Link to="/maintenance-calendar" className={`nav-item ${isActive('/maintenance-calendar')}`}>
         Maintenance Calendar
       </Link>
+      <Link to="/equipment-home" className={`nav-item ${isActive('/equipment-home')}`}>
+        Equipment
+      </Link>
       <Link to="/reports" className={`nav-item ${isActive('/reports')}`}>
         Reporting
       </Link>
-      <Link to="/teams" className={`nav-item ${isActive('/teams') && !location.pathname.startsWith('/skill-teams') ? 'active' : ''}`}>
-        Maintenance Teams
-      </Link>
-      <Link to="/skills" className={`nav-item ${isActive('/skills')}`}>
-        Skills
-      </Link>
-      <Link to="/matches" className={`nav-item ${isActive('/matches')}`}>
-        Matches
-      </Link>
-      <Link to="/skill-teams" className={`nav-item ${isActive('/skill-teams')}`}>
-        Skill Teams
+      <Link to="/teams" className={`nav-item ${isActive('/teams')}`}>
+        Teams
       </Link>
       {user && (
         <div className="nav-user">
