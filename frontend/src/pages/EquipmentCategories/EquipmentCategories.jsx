@@ -29,7 +29,7 @@ const EquipmentCategories = () => {
         <div className="table-card">
           <div className="table-header">
             <div className="header-left">
-              <button className="btn-new">
+              <button className="btn-new" onClick={() => navigate('/equipment-categories/new')}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -44,20 +44,19 @@ const EquipmentCategories = () => {
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Responsible</th>
-                  <th>Company</th>
+                  <th>Default Team</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="3" style={{ textAlign: 'center', padding: '20px' }}>
+                    <td colSpan="2" style={{ textAlign: 'center', padding: '20px' }}>
                       Loading...
                     </td>
                   </tr>
                 ) : categories.length === 0 ? (
                   <tr>
-                    <td colSpan="3" style={{ textAlign: 'center', padding: '20px' }}>
+                    <td colSpan="2" style={{ textAlign: 'center', padding: '20px' }}>
                       No categories found
                     </td>
                   </tr>
@@ -65,8 +64,7 @@ const EquipmentCategories = () => {
                   categories.map((category) => (
                     <tr key={category._id || category.id}>
                       <td>{category.name}</td>
-                      <td>{category.responsible || 'OdooBot'}</td>
-                      <td>{category.company || 'My Company (San Francisco)'}</td>
+                      <td>{category.defaultMaintenanceTeam?.name || '—'}</td>
                     </tr>
                   ))
                 )}
@@ -80,4 +78,3 @@ const EquipmentCategories = () => {
 }
 
 export default EquipmentCategories
-

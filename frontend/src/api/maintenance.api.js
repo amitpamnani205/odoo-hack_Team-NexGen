@@ -44,3 +44,8 @@ export const getPreventiveRequests = async () => {
   return { data }
 }
 
+export const getOpenRequestsCount = async (equipmentId) => {
+  const res = await api.get(`${base}/equipment/${equipmentId}/open-count`)
+  const data = res?.data?.data || res.data
+  return { data }
+}

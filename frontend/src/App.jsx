@@ -6,7 +6,9 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import Dashboard from './pages/Dashboard/Dashboard'
 import EquipmentList from './pages/EquipmentList/EquipmentList'
 import EquipmentForm from './pages/EquipmentForm/EquipmentForm'
+import EquipmentDetail from './pages/EquipmentDetail/EquipmentDetail'
 import EquipmentCategories from './pages/EquipmentCategories/EquipmentCategories'
+import EquipmentCategoryForm from './pages/EquipmentCategoryForm/EquipmentCategoryForm'
 import WorkCenterList from './pages/WorkCenterList/WorkCenterList'
 import WorkCenterForm from './pages/WorkCenterForm/WorkCenterForm'
 import EquipmentHome from './pages/EquipmentHome/EquipmentHome'
@@ -33,8 +35,10 @@ function App() {
         <Route path="/equipment-home" element={<EquipmentHome />} />
         <Route path="/equipment" element={<EquipmentList />} />
         <Route path="/equipment/new" element={<EquipmentForm />} />
-        <Route path="/equipment/:id" element={<EquipmentForm />} />
+        <Route path="/equipment/:id" element={<EquipmentDetail />} />
+        <Route path="/equipment/:id/edit" element={<EquipmentForm />} />
         <Route path="/equipment-categories" element={<EquipmentCategories />} />
+        <Route path="/equipment-categories/new" element={<EquipmentCategoryForm />} />
         <Route path="/work-centers" element={<WorkCenterList />} />
         <Route path="/work-centers/new" element={<WorkCenterForm />} />
         <Route path="/work-centers/:id" element={<WorkCenterForm />} />
@@ -56,4 +60,3 @@ function App() {
 }
 
 export default App
-

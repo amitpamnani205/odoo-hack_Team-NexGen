@@ -43,11 +43,11 @@ const EquipmentList = () => {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Equipment</th>
-                  <th>Department</th>
-                  <th>Work Center</th>
-                  <th>Technician</th>
-                  <th>Equipment Category</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Maintenance Team</th>
+                <th>Location</th>
+                <th>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -65,17 +65,21 @@ const EquipmentList = () => {
                   </tr>
                 ) : (
                   equipment.map((item) => (
-                    <tr
-                      key={item._id || item.id}
-                      onClick={() => navigate(`/equipment/${item._id || item.id}`)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <td>{item.name}</td>
-                      <td>{item.department || 'N/A'}</td>
-                      <td>{item.workCenter?.name || 'N/A'}</td>
-                      <td>{item.technician?.name || 'N/A'}</td>
-                      <td>{item.category?.name || 'N/A'}</td>
-                    </tr>
+                  <tr
+                    key={item._id || item.id}
+                    onClick={() => navigate(`/equipment/${item._id || item.id}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>{item.name}</td>
+                    <td>{item.categoryId?.name || 'N/A'}</td>
+                    <td>{item.maintenanceTeamId?.name || item.categoryId?.defaultMaintenanceTeam?.name || 'Auto from category'}</td>
+                    <td>{item.location || 'N/A'}</td>
+                    <td>
+                      <span className={`status-pill ${item.isScrapped ? 'scrapped' : 'active'}`}>
+                        {item.isScrapped ? 'Scrapped' : 'Active'}
+                      </span>
+                    </td>
+                  </tr>
                   ))
                 )}
               </tbody>
@@ -88,4 +92,3 @@ const EquipmentList = () => {
 }
 
 export default EquipmentList
-

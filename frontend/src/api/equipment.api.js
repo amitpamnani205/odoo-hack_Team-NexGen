@@ -13,10 +13,14 @@ export const createEquipment = async (data) => {
   return { data: res?.data?.data || res?.data }
 }
 
-// Backend currently exposes only list/create; add by-id handlers when backend supports them
 export const getEquipmentCategories = async () => {
   const res = await api.get('/equipment-categories')
   return { data: unwrapList(res) }
+}
+
+export const createEquipmentCategory = async (payload) => {
+  const res = await api.post('/equipment-categories', payload)
+  return { data: res?.data?.data || res?.data }
 }
 
 export const getEquipmentById = async (id) => {
@@ -33,4 +37,3 @@ export const deleteEquipment = async (id) => {
   const res = await api.delete(`/equipment/${id}`)
   return { data: res?.data?.data || res?.data }
 }
-

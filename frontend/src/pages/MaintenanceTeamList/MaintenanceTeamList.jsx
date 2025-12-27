@@ -71,7 +71,7 @@ const MaintenanceTeamList = () => {
                     >
                       <td>{team.name}</td>
                       <td>
-                        {team.members?.map(m => m.name).join(', ') || 'No members'}
+                        {team.teamMembers?.map(m => m.name).join(', ') || 'No members'}
                       </td>
                       <td>{team.description || 'N/A'}</td>
                     </tr>
@@ -87,4 +87,3 @@ const MaintenanceTeamList = () => {
 }
 
 export default MaintenanceTeamList
-

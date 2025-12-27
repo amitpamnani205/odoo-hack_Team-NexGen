@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import * as equipmentAPI from '../api/equipment.api'
+import * as maintenanceAPI from '../api/maintenance.api'
 import './EquipmentSmartButton.css'
 
 const EquipmentSmartButton = ({ equipmentId }) => {
@@ -16,13 +16,9 @@ const EquipmentSmartButton = ({ equipmentId }) => {
 
   const fetchRequestCount = async () => {
     try {
-      const response = await equipmentAPI.getEquipmentByEquipment(equipmentId)
-      const requests = response.data || []
-      // Count only open requests (not repaired or scrap)
-      const openRequests = requests.filter(
-        req => req.stage !== 'repaired' && req.stage !== 'scrap'
-      )
-      setRequestCount(openRequests.length)
+      const response = await maintenanceAPI.getOpenRequestsCount(equipmentId)
+      const count = response?.data?.count ?? 0
+      setRequestCount(count)
     } catch (error) {
       console.error('Error fetching equipment requests:', error)
     } finally {
@@ -45,4 +41,3 @@ const EquipmentSmartButton = ({ equipmentId }) => {
 }
 
 export default EquipmentSmartButton
-

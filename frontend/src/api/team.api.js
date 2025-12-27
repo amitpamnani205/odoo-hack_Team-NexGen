@@ -29,3 +29,12 @@ export const deleteTeam = async (id) => {
   return { data: res?.data?.data || res?.data }
 }
 
+export const addTeamMember = async (id, memberId) => {
+  const res = await api.post(`${base}/${id}/members`, { memberId })
+  return { data: res?.data?.data || res?.data }
+}
+
+export const removeTeamMember = async (id, memberId) => {
+  const res = await api.delete(`${base}/${id}/members/${memberId}`)
+  return { data: res?.data?.data || res?.data }
+}

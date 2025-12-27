@@ -9,8 +9,11 @@ const MaintenanceTeamForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    members: []
+    teamMembers: []
   })
+  const [membersInput, setMembersInput] = useState('')
+  const [memberId, setMemberId] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -26,7 +29,7 @@ const MaintenanceTeamForm = () => {
       setFormData({
         name: data.name || '',
         description: data.description || '',
-        members: data.teamMembers || data.members || []
+        teamMembers: data.teamMembers || []
       })
     } catch (error) {
       console.error('Error fetching team:', error)
@@ -43,19 +46,54 @@ const MaintenanceTeamForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setErrorMsg('')
     setLoading(true)
     try {
+      let payload = {
+        name: formData.name,
+        description: formData.description
+      }
+      if (!id) {
+        const memberIds = membersInput
+          .split(',')
+          .map((val) => val.trim())
+          .filter(Boolean)
+        payload = {
+          ...payload,
+          teamMembers: memberIds
+        }
+      }
       if (id) {
-        await teamAPI.updateTeam(id, formData)
+        await teamAPI.updateTeam(id, payload)
       } else {
-        await teamAPI.createTeam(formData)
+        await teamAPI.createTeam(payload)
       }
       navigate('/teams')
     } catch (error) {
       console.error('Error saving team:', error)
-      alert('Error saving team')
+      setErrorMsg('Error saving team')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleAddMember = async () => {
+    if (!memberId) {
+      setErrorMsg('Member ID is required')
+      return
+    }
+    setErrorMsg('')
+    try {
+      const response = await teamAPI.addTeamMember(id, memberId)
+      const data = response?.data?.data || response?.data || {}
+      setFormData(prev => ({
+        ...prev,
+        teamMembers: data.teamMembers || prev.teamMembers
+      }))
+      setMemberId('')
+    } catch (error) {
+      console.error('Error adding member:', error)
+      setErrorMsg(error?.response?.data?.message || 'Error adding member')
     }
   }
 
@@ -64,6 +102,7 @@ const MaintenanceTeamForm = () => {
       <div className="content">
         <div className="form-card">
           <h1>{id ? 'Edit Maintenance Team' : 'New Maintenance Team'}</h1>
+          {errorMsg && <div className="error-message">{errorMsg}</div>}
           <form onSubmit={handleSubmit}>
             <div className="form-grid">
               <div className="form-column">
@@ -86,6 +125,38 @@ const MaintenanceTeamForm = () => {
                     rows="4"
                   />
                 </div>
+                {!id && (
+                  <div className="form-group">
+                    <label>Team Members (IDs, comma-separated)</label>
+                    <input
+                      type="text"
+                      value={membersInput}
+                      onChange={(e) => setMembersInput(e.target.value)}
+                      placeholder="e.g. 64b...a1, 64b...c2"
+                    />
+                  </div>
+                )}
+                {id && (
+                  <div className="form-group">
+                    <label>Add Member by ID</label>
+                    <div className="inline">
+                      <input
+                        type="text"
+                        value={memberId}
+                        onChange={(e) => setMemberId(e.target.value)}
+                        placeholder="Member ID (24 hex)"
+                      />
+                      <button type="button" className="btn-save" onClick={handleAddMember}>
+                        Add
+                      </button>
+                    </div>
+                    {formData.teamMembers?.length > 0 && (
+                      <div className="readonly-note">
+                        {formData.teamMembers.map(m => m.name || m.email || m._id).join(', ')}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             <div className="form-actions">
@@ -104,4 +175,3 @@ const MaintenanceTeamForm = () => {
 }
 
 export default MaintenanceTeamForm
-

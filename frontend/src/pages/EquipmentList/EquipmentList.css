@@ -97,3 +97,25 @@
   border-bottom: none;
 }
 
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  border: 1px solid transparent;
+}
+
+.status-pill.active {
+  background: #e9f9ef;
+  color: #1c9a4b;
+  border-color: #c9f0d1;
+}
+
+.status-pill.scrapped {
+  background: #fff4f6;
+  color: #c63b67;
+  border-color: #ffd6e1;
+}
+

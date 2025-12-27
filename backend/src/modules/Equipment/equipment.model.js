@@ -35,9 +35,8 @@ const equipmentSchema = new mongoose.Schema(
     },
 
     defaultTechnicianId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default: null,
+      type: String,
+      default: "",
     },
 
     // ===== OWNERSHIP =====
@@ -48,7 +47,7 @@ const equipmentSchema = new mongoose.Schema(
     },
 
     assignedToId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       required: true,
     },
 

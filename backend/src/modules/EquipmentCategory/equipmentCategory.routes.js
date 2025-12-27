@@ -1,4 +1,5 @@
 import express from "express";
+import { authenticate, authorize } from "../../middleware/auth.middleware.js";
 import {
   createCategory,
   getCategories,
@@ -7,9 +8,10 @@ import {
 
 const router = express.Router();
 
-router.post("/", createCategory);
+router.use(authenticate);
+
+router.post("/", authorize("admin", "manager"), createCategory);
 router.get("/", getCategories);
 router.get("/:id", getCategoryById);
 
 export default router;
-

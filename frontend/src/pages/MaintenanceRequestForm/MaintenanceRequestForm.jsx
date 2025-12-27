@@ -1,35 +1,24 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
 import * as maintenanceAPI from '../../api/maintenance.api'
 import * as equipmentAPI from '../../api/equipment.api'
-import * as workCenterAPI from '../../api/workcenter.api'
 import './MaintenanceRequestForm.css'
 
 const MaintenanceRequestForm = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const { user } = useAuth()
   const scheduledDateFromState = location.state?.scheduledDate
+  const equipmentIdFromState = location.state?.equipmentId
   const [formData, setFormData] = useState({
     subject: '',
-    createdBy: user?.name || 'Abigail Peterson',
-    equipment: '',
-    workCenter: '',
-    department: 'My Company (San Francisco)',
-    category: '',
-    requestDate: new Date().toISOString().split('T')[0],
-    completionType: scheduledDateFromState ? 'preventive' : 'corrective',
+    equipmentId: equipmentIdFromState || '',
+    requestType: scheduledDateFromState ? 'preventive' : 'corrective',
     scheduledDate: scheduledDateFromState || '',
     duration: 0,
-    notes: '',
-    assignedTo: '',
-    stage: 'new'
+    description: ''
   })
   const [equipmentList, setEquipmentList] = useState([])
-  const [workCenters, setWorkCenters] = useState([])
-  const [useWorkCenter, setUseWorkCenter] = useState(false)
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
@@ -39,15 +28,20 @@ const MaintenanceRequestForm = () => {
       fetchRequest()
     }
     fetchEquipment()
-    fetchWorkCenters()
   }, [id])
 
   const fetchRequest = async () => {
     try {
       const response = await maintenanceAPI.getMaintenanceRequestById(id)
       const data = response?.data?.data || response?.data || {}
-      setFormData(data)
-      setUseWorkCenter(!!data.workCenter)
+      setFormData({
+        subject: data.subject || '',
+        equipmentId: data.equipmentId?._id || data.equipmentId || '',
+        requestType: data.requestType || 'corrective',
+        scheduledDate: data.scheduledDate ? data.scheduledDate.split('T')[0] : '',
+        duration: data.duration || 0,
+        description: data.description || ''
+      })
     } catch (error) {
       console.error('Error fetching request:', error)
     }
@@ -63,25 +57,11 @@ const MaintenanceRequestForm = () => {
     }
   }
 
-  const fetchWorkCenters = async () => {
-    try {
-      const response = await workCenterAPI.getWorkCenters()
-      const list = Array.isArray(response?.data) ? response.data : []
-      setWorkCenters(list)
-    } catch (error) {
-      console.error('Error fetching work centers:', error)
-    }
-  }
-
   const handleEquipmentChange = (e) => {
     const equipmentId = e.target.value
-    const selectedEquipment = equipmentList.find(eq => (eq._id || eq.id) === equipmentId)
-    
     setFormData(prev => ({
       ...prev,
-      equipment: equipmentId,
-      category: selectedEquipment?.category?._id || selectedEquipment?.category?.id || '',
-      maintenanceTeam: selectedEquipment?.maintenanceTeam || ''
+      equipmentId: equipmentId
     }))
   }
 
@@ -98,16 +78,16 @@ const MaintenanceRequestForm = () => {
     setErrorMsg('')
     setSuccessMsg('')
 
-    if (!formData.equipment) {
+    if (!formData.equipmentId) {
       setErrorMsg('Please select equipment before submitting.')
       return
     }
 
     const payload = {
       subject: formData.subject,
-      description: formData.notes || formData.description || '',
-      requestType: formData.completionType || 'corrective',
-      equipmentId: formData.equipment,
+      description: formData.description || '',
+      requestType: formData.requestType || 'corrective',
+      equipmentId: formData.equipmentId,
       scheduledDate: formData.scheduledDate || null,
       priority: formData.priority || 'medium',
       duration: formData.duration,
@@ -156,86 +136,25 @@ const MaintenanceRequestForm = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Created By</label>
-                  <input
-                    type="text"
-                    name="createdBy"
-                    value={formData.createdBy}
-                    onChange={handleChange}
-                    required
-                  />
+                  <label>Equipment</label>
+                  <select name="equipmentId" value={formData.equipmentId} onChange={handleEquipmentChange}>
+                    <option value="">Select Equipment</option>
+                    {equipmentList.map(eq => (
+                      <option key={eq._id || eq.id} value={eq._id || eq.id}>
+                        {eq.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="form-group">
-                  <label>
-                    {useWorkCenter ? 'Work Center' : 'Equipment'}
-                  </label>
-                  {useWorkCenter ? (
-                    <select name="workCenter" value={formData.workCenter} onChange={handleChange}>
-                      <option value="">Select Work Center</option>
-                      {workCenters.map(wc => (
-                        <option key={wc._id || wc.id} value={wc._id || wc.id}>
-                          {wc.name}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <select name="equipment" value={formData.equipment} onChange={handleEquipmentChange}>
-                      <option value="">Select Equipment</option>
-                      {equipmentList.map(eq => (
-                        <option key={eq._id || eq.id} value={eq._id || eq.id}>
-                          {eq.name}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                </div>
-                <div className="form-group">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={useWorkCenter}
-                      onChange={(e) => setUseWorkCenter(e.target.checked)}
-                    />
-                    Use Work Center instead of Equipment
-                  </label>
-                </div>
-                <div className="form-group">
-                  <label>Department</label>
-                  <input
-                    type="text"
-                    name="department"
-                    value={formData.department}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Category</label>
-                  <input
-                    type="text"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Request Date</label>
-                  <input
-                    type="date"
-                    name="requestDate"
-                    value={formData.requestDate}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Completion Type</label>
+                  <label>Request Type</label>
                   <div style={{ display: 'flex', gap: '20px', marginTop: '8px' }}>
                     <label>
                       <input
                         type="radio"
-                        name="completionType"
+                        name="requestType"
                         value="preventive"
-                        checked={formData.completionType === 'preventive'}
+                        checked={formData.requestType === 'preventive'}
                         onChange={handleChange}
                       />
                       Preventive
@@ -243,16 +162,16 @@ const MaintenanceRequestForm = () => {
                     <label>
                       <input
                         type="radio"
-                        name="completionType"
+                        name="requestType"
                         value="corrective"
-                        checked={formData.completionType === 'corrective'}
+                        checked={formData.requestType === 'corrective'}
                         onChange={handleChange}
                       />
                       Corrective
                     </label>
                   </div>
                 </div>
-                {formData.completionType === 'preventive' && (
+                {formData.requestType === 'preventive' && (
                   <div className="form-group">
                     <label>Scheduled Date</label>
                     <input
@@ -274,10 +193,10 @@ const MaintenanceRequestForm = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Notes</label>
+                  <label>Description</label>
                   <textarea
-                    name="notes"
-                    value={formData.notes}
+                    name="description"
+                    value={formData.description}
                     onChange={handleChange}
                     rows="4"
                   />
@@ -300,4 +219,3 @@ const MaintenanceRequestForm = () => {
 }
 
 export default MaintenanceRequestForm
-

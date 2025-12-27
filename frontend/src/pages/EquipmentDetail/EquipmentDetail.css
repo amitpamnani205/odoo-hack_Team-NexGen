@@ -1,0 +1,125 @@
+.equipment-detail {
+  min-height: 100vh;
+  background: var(--bg-gradient);
+}
+
+.equipment-detail .content {
+  padding: 32px 40px 64px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.detail-card {
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(36, 44, 90, 0.08);
+}
+
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.detail-header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.detail-header .muted {
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-ghost {
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  padding: 10px 18px;
+  border: none;
+  background: var(--primary-purple);
+  color: #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.smart-buttons {
+  margin: 16px 0;
+}
+
+.smart-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #f5f6fa;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px 20px;
+  margin-top: 16px;
+}
+
+.detail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-group.full {
+  margin-top: 16px;
+}
+
+.detail-group label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.description-box {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: #f9fafc;
+  min-height: 60px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  border: 1px solid transparent;
+  width: fit-content;
+}
+
+.status-pill.active {
+  background: #e9f9ef;
+  color: #1c9a4b;
+  border-color: #c9f0d1;
+}
+
+.status-pill.scrapped {
+  background: #fff4f6;
+  color: #c63b67;
+  border-color: #ffd6e1;
+}
+

@@ -22,6 +22,9 @@ router.post('/', authorize('admin', 'manager'), createTeam);
 // Get all teams
 router.get('/', getAllTeams);
 
+// Get teams by member ID
+router.get('/member/:memberId', getTeamsByMember);
+
 // Get team by ID
 router.get('/:id', getTeamById);
 
@@ -37,8 +40,4 @@ router.post('/:id/members', authorize('admin', 'manager'), addTeamMember);
 // Remove team member (admin or manager only)
 router.delete('/:id/members/:memberId', authorize('admin', 'manager'), removeTeamMember);
 
-// Get teams by member ID
-router.get('/member/:memberId', getTeamsByMember);
-
 export default router;
-

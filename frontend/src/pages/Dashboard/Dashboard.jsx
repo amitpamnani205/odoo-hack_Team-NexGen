@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import * as maintenanceAPI from '../../api/maintenance.api'
+import * as equipmentAPI from '../../api/equipment.api'
 import './Dashboard.css'
 
 const Dashboard = () => {
   const navigate = useNavigate()
   const [stats, setStats] = useState({
-    totalEquipment: 0,
-    openRequests: 0,
-    scrapped: 0,
+    criticalEquipment: 0,
+    technicianLoad: 0,
+    pendingRequests: 0,
+    overdueRequests: 0,
   })
   const [requests, setRequests] = useState([])
   const [loading, setLoading] = useState(true)
@@ -19,9 +21,9 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      const [equipmentRes, openReqRes] = await Promise.all([
-        maintenanceAPI.getMaintenanceRequests({}),
-        maintenanceAPI.getMaintenanceRequests({ stage: 'new' })
+      const [equipmentRes, requestsRes] = await Promise.all([
+        equipmentAPI.getEquipment(),
+        maintenanceAPI.getMaintenanceRequests({})
       ])
 
       const equipRaw = Array.isArray(equipmentRes?.data?.data)
@@ -30,29 +32,41 @@ const Dashboard = () => {
           ? equipmentRes.data
           : []
 
-      const openRaw = Array.isArray(openReqRes?.data?.data)
-        ? openReqRes.data.data
-        : Array.isArray(openReqRes?.data)
-          ? openReqRes.data
+      const allRequests = Array.isArray(requestsRes?.data?.data)
+        ? requestsRes.data.data
+        : Array.isArray(requestsRes?.data)
+          ? requestsRes.data
           : []
 
-      const normalized = openRaw.map((r) => ({
+      const normalized = allRequests.map((r) => ({
         ...r,
-        completionType: r.completionType || r.requestType,
-        assignedTo: r.assignedTo || r.assignedTechnicianId,
-        requestDate: r.requestDate || r.createdAt,
+        requestType: r.requestType || r.completionType,
+        assignedTechnicianId: r.assignedTechnicianId || r.assignedTo,
+        requestDate: r.requestDate || r.createdAt
       }))
 
       setRequests(normalized.slice(0, 4))
 
-      const totalEquipment = equipRaw.length
-      const scrappedCount = equipRaw.filter((e) => e.isScrapped).length
-      const openCount = openRaw.length
+      const openRequests = normalized.filter((r) => r.stage === 'new' || r.stage === 'in_progress')
+      const pendingCount = openRequests.filter((r) => r.stage === 'new').length
+      const overdueCount = openRequests.filter((r) => {
+        if (r.isOverdue) return true
+        if (!r.scheduledDate) return false
+        return new Date(r.scheduledDate) < new Date()
+      }).length
+      const criticalCount = openRequests.filter((r) =>
+        r.priority === 'high' || r.priority === 'urgent' || r.isOverdue
+      ).length
+      const assignedOpen = openRequests.filter((r) => r.assignedTechnicianId).length
+      const technicianLoad = openRequests.length > 0
+        ? Math.round((assignedOpen / openRequests.length) * 100)
+        : 0
 
       setStats({
-        totalEquipment,
-        openRequests: openCount,
-        scrapped: scrappedCount,
+        criticalEquipment: criticalCount,
+        technicianLoad,
+        pendingRequests: pendingCount,
+        overdueRequests: overdueCount,
       })
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
@@ -67,7 +81,7 @@ const Dashboard = () => {
         <div className="table-container">
           <div className="table-header">
             <button className="btn-new" onClick={() => navigate('/maintenance/new')}>
-              + New
+              New
             </button>
             <div className="search-bar">
               <svg className="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -98,58 +112,32 @@ const Dashboard = () => {
           </div>
 
           <div className="summary-grid-inline">
-            <div className="card card-red">
-              <div className="card-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M9.5 9.5l5 5m0-5l-5 5" stroke="currentColor" strokeWidth="2" />
-                </svg>
-              </div>
-              <div className="card-info">
-                <h3>Total Equipment</h3>
-                <div className="value">{stats.totalEquipment}</div>
-                <div className="subtext">All assets in the system</div>
-              </div>
+            <div className="summary-card summary-red">
+              <div className="summary-title">Critical Equipment</div>
+              <div className="summary-value">{stats.criticalEquipment} Units</div>
+              <div className="summary-subtext">(High priority or overdue)</div>
             </div>
-
-            <div className="card card-blue">
-              <div className="card-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M8 15h8M8 12h6M8 9h4" stroke="currentColor" strokeWidth="2" />
-                </svg>
-              </div>
-              <div className="card-info">
-                <h3>Open Requests</h3>
-                <div className="value">{stats.openRequests}</div>
-                <div className="subtext">New maintenance tickets</div>
-              </div>
+            <div className="summary-card summary-blue">
+              <div className="summary-title">Technician Load</div>
+              <div className="summary-value">{stats.technicianLoad}% Utilized</div>
+              <div className="summary-subtext">(Assign Carefully)</div>
             </div>
-
-            <div className="card card-green">
-              <div className="card-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" fill="none" />
-                  <circle cx="12" cy="12" r="9" />
-                </svg>
-              </div>
-              <div className="card-info">
-                <h3>Scrapped</h3>
-                <div className="value">{stats.scrapped}</div>
-                <div className="subtext">Marked unusable</div>
-              </div>
+            <div className="summary-card summary-green">
+              <div className="summary-title">Open Requests</div>
+              <div className="summary-value">{stats.pendingRequests} Pending</div>
+              <div className="summary-subtext">{stats.overdueRequests} Overdue</div>
             </div>
           </div>
 
           <table className="data-table">
             <thead>
               <tr>
-                <th>Type</th>
-                <th>Equipment</th>
-                <th>Added On</th>
-                <th>Assigned To</th>
-                <th>Status</th>
-                <th>Priority</th>
+                <th>Subject</th>
+                <th>Employee</th>
+                <th>Technician</th>
+                <th>Category</th>
+                <th>Stage</th>
+                <th>Company</th>
               </tr>
             </thead>
             <tbody>
@@ -168,22 +156,12 @@ const Dashboard = () => {
               ) : (
                 requests.map((request) => (
                   <tr key={request._id || request.id} onClick={() => navigate(`/maintenance/${request._id || request.id}`)} style={{ cursor: 'pointer' }}>
-                    <td className={`type-${request.type?.toLowerCase() || 'repair'}`}>
-                      {request.completionType === 'preventive' ? 'Preventive' : 'Corrective'}
-                    </td>
-                    <td>{request.equipment?.name || 'N/A'}</td>
-                    <td>{new Date(request.requestDate || request.createdAt).toLocaleDateString()}</td>
-                    <td>{request.assignedTo?.name || 'Unassigned'}</td>
-                    <td>
-                      <span className={`badge badge-${request.stage === 'new' ? 'pending' : request.stage === 'in_progress' ? 'progress' : 'completed'}`}>
-                        {request.stage === 'new' ? 'New' : request.stage === 'in_progress' ? 'In Progress' : request.stage === 'repaired' ? 'Repaired' : request.stage}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`badge-priority ${request.priority || 'medium'}`}>
-                        {request.priority || 'Medium'}
-                      </span>
-                    </td>
+                    <td>{request.subject || '—'}</td>
+                    <td>{request.createdById?.name || '—'}</td>
+                    <td>{request.assignedTechnicianId?.name || '—'}</td>
+                    <td>{request.categoryId?.name || '—'}</td>
+                    <td>{request.stage || '—'}</td>
+                    <td>{request.equipmentId?.company || '—'}</td>
                   </tr>
                 ))
               )}
@@ -212,4 +190,3 @@ const Dashboard = () => {
 }
 
 export default Dashboard
-

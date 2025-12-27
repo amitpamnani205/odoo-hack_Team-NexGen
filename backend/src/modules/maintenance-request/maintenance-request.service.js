@@ -11,6 +11,7 @@ export const createRequestService = async (requestData, createdById) => {
   const equipmentId = requestData.equipmentId;
   const scheduledDate = requestData.scheduledDate;
   const priority = requestData.priority;
+  const duration = requestData.duration;
 
   // Validate equipment exists
   const equipment = await Equipment.findById(equipmentId);
@@ -57,13 +58,14 @@ export const createRequestService = async (requestData, createdById) => {
     maintenanceTeamId: maintenanceTeamId,
     scheduledDate: scheduledDate,
     priority: finalPriority,
+    duration: duration || 0,
     createdById: createdById,
     stage: 'new'
   });
 
   // Get the created request with populated fields
   const populatedRequest = await MaintenanceRequest.findById(newRequest._id)
-    .populate('equipmentId', 'name serialNumber location')
+    .populate('equipmentId', 'name serialNumber location company')
     .populate('maintenanceTeamId', 'name')
     .populate('categoryId', 'name')
     .populate('assignedTechnicianId', 'name email')
@@ -112,7 +114,7 @@ export const getAllRequestsService = async (filters) => {
 
   // Find requests
   const requests = await MaintenanceRequest.find(query)
-    .populate('equipmentId', 'name serialNumber location')
+    .populate('equipmentId', 'name serialNumber location company')
     .populate('maintenanceTeamId', 'name')
     .populate('categoryId', 'name')
     .populate('assignedTechnicianId', 'name email')
@@ -125,7 +127,7 @@ export const getAllRequestsService = async (filters) => {
 // Get request by ID
 export const getRequestByIdService = async (requestId) => {
   const request = await MaintenanceRequest.findById(requestId)
-    .populate('equipmentId', 'name serialNumber location')
+    .populate('equipmentId', 'name serialNumber location company')
     .populate('maintenanceTeamId', 'name')
     .populate('categoryId', 'name')
     .populate('assignedTechnicianId', 'name email')
@@ -179,7 +181,7 @@ export const updateRequestService = async (requestId, updateData) => {
 
   // Get updated request with populated fields
   const updatedRequest = await MaintenanceRequest.findById(requestId)
-    .populate('equipmentId', 'name serialNumber location')
+    .populate('equipmentId', 'name serialNumber location company')
     .populate('maintenanceTeamId', 'name')
     .populate('categoryId', 'name')
     .populate('assignedTechnicianId', 'name email')
@@ -217,7 +219,7 @@ export const assignTechnicianService = async (requestId, technicianId) => {
 
   // Get updated request with populated fields
   const updatedRequest = await MaintenanceRequest.findById(requestId)
-    .populate('equipmentId', 'name serialNumber location')
+    .populate('equipmentId', 'name serialNumber location company')
     .populate('maintenanceTeamId', 'name')
     .populate('categoryId', 'name')
     .populate('assignedTechnicianId', 'name email')
@@ -248,7 +250,7 @@ export const updateStageService = async (requestId, newStage, userId) => {
   const current = request.stage;
   const allowed =
     (current === 'new' && (newStage === 'in_progress' || newStage === 'scrap')) ||
-    (current === 'in_progress' && newStage === 'repaired') ||
+    (current === 'in_progress' && (newStage === 'repaired' || newStage === 'scrap')) ||
     (current === newStage); // idempotent no-op
 
   if (!allowed) {
@@ -286,7 +288,7 @@ export const updateStageService = async (requestId, newStage, userId) => {
 
   // Get updated request with populated fields
   const updatedRequest = await MaintenanceRequest.findById(requestId)
-    .populate('equipmentId', 'name serialNumber location')
+    .populate('equipmentId', 'name serialNumber location company')
     .populate('maintenanceTeamId', 'name')
     .populate('categoryId', 'name')
     .populate('assignedTechnicianId', 'name email')
@@ -299,7 +301,7 @@ export const updateStageService = async (requestId, newStage, userId) => {
 export const getRequestsByEquipmentService = async (equipmentId) => {
   // Find requests that are new or in progress
   const allRequests = await MaintenanceRequest.find({ equipmentId: equipmentId })
-    .populate('equipmentId', 'name serialNumber location')
+    .populate('equipmentId', 'name serialNumber location company')
     .populate('maintenanceTeamId', 'name')
     .populate('categoryId', 'name')
     .populate('assignedTechnicianId', 'name email')
@@ -339,7 +341,7 @@ export const getOpenRequestsCountService = async (equipmentId) => {
 export const getPreventiveRequestsForCalendarService = async (startDate, endDate) => {
   // Get all preventive requests
   const allRequests = await MaintenanceRequest.find({ requestType: 'preventive' })
-    .populate('equipmentId', 'name serialNumber location')
+    .populate('equipmentId', 'name serialNumber location company')
     .populate('maintenanceTeamId', 'name')
     .populate('categoryId', 'name')
     .populate('assignedTechnicianId', 'name email')

@@ -21,7 +21,7 @@ const MaintenanceKanban = () => {
 
   const fetchRequests = async () => {
     try {
-      const params = equipmentId ? { equipment: equipmentId } : {}
+      const params = equipmentId ? { equipmentId } : {}
       const response = await maintenanceAPI.getMaintenanceRequests(params)
       const data = response.data || []
       
@@ -60,6 +60,9 @@ const MaintenanceKanban = () => {
 
   const renderCard = (request) => {
     const isOverdue = request.isOverdue || (request.scheduledDate && new Date(request.scheduledDate) < new Date())
+    const requestTypeLabel = request.requestType === 'preventive' ? 'Preventive' : 'Corrective'
+    const equipmentName = request.equipmentId?.name || 'N/A'
+    const assignedName = request.assignedTechnicianId?.name || 'Unassigned'
     
     return (
       <div
@@ -70,16 +73,16 @@ const MaintenanceKanban = () => {
         onClick={() => navigate(`/maintenance/${request._id || request.id}`)}
       >
         <div className="card-header">
-          <span className="card-type">{request.completionType === 'preventive' ? 'Preventive' : 'Corrective'}</span>
+          <span className="card-type">{requestTypeLabel}</span>
           {isOverdue && <span className="overdue-badge">Overdue</span>}
         </div>
         <h4>{request.subject}</h4>
         <div className="card-info">
-          <p><strong>Equipment:</strong> {request.equipment?.name || 'N/A'}</p>
-          <p><strong>Assigned:</strong> {request.assignedTo?.name || 'Unassigned'}</p>
-          {request.assignedTo && (
+          <p><strong>Equipment:</strong> {equipmentName}</p>
+          <p><strong>Assigned:</strong> {assignedName}</p>
+          {request.assignedTechnicianId && (
             <div className="avatar">
-              {request.assignedTo.name.charAt(0).toUpperCase()}
+              {request.assignedTechnicianId.name.charAt(0).toUpperCase()}
             </div>
           )}
         </div>
@@ -162,4 +165,3 @@ const MaintenanceKanban = () => {
 }
 
 export default MaintenanceKanban
-

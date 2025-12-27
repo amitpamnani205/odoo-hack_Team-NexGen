@@ -9,6 +9,7 @@ import maintenanceTeamRoutes from './modules/maintenance-team/maintenance-team.r
 import maintenanceRequestRoutes from './modules/maintenance-request/maintenance-request.routes.js';
 import equipmentRoutes from './modules/Equipment/equipment.routes.js';
 import equipmentCategoryRoutes from './modules/EquipmentCategory/equipmentCategory.routes.js';
+import workCenterRoutes from './modules/work-center/work-center.routes.js';
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use(`${apiPrefix}/maintenance-teams`, maintenanceTeamRoutes);
 app.use(`${apiPrefix}/maintenance-requests`, maintenanceRequestRoutes);
 app.use(`${apiPrefix}/equipment`, equipmentRoutes);
 app.use(`${apiPrefix}/equipment-categories`, equipmentCategoryRoutes);
+app.use(`${apiPrefix}/workcenters`, workCenterRoutes);
 
 // error handler
 app.use(errorHandler);

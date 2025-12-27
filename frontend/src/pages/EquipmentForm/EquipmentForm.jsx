@@ -99,7 +99,7 @@ const EquipmentForm = () => {
         categoryId: formData.category,
         assignedToType: formData.assignedToType,
         assignedToId: formData.assignedTo,
-        defaultTechnicianId: formData.defaultTechnicianId || null,
+        defaultTechnicianId: formData.defaultTechnicianId || '',
         company: formData.company,
         location: formData.location,
         workCenter: formData.workCenter,
@@ -185,7 +185,8 @@ const EquipmentForm = () => {
                       name="assignedTo"
                       value={formData.assignedTo}
                       onChange={handleChange}
-                      placeholder="Name or ID"
+                      placeholder="Employee or Department"
+                      required
                     />
                   </div>
                 </div>
@@ -230,7 +231,7 @@ const EquipmentForm = () => {
                     name="defaultTechnicianId"
                     value={formData.defaultTechnicianId}
                     onChange={handleChange}
-                    placeholder="Technician name or ID"
+                    placeholder="Technician name"
                   />
                 </div>
                 <div className="form-group">
@@ -249,6 +250,7 @@ const EquipmentForm = () => {
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -280,4 +282,3 @@ const EquipmentForm = () => {
 }
 
 export default EquipmentForm
-
