@@ -2,7 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './utils/errorHandler.js';
+import { config } from './config/env.js';
 import authRoutes from './modules/auth/auth.routes.js';
+import equipmentRoutes from './modules/Equipment/equipment.routes.js';
+import equipmentCategoryRoutes from './modules/EquipmentCategory/equipmentCategory.routes.js';
 
 const app = express();
 
@@ -20,7 +23,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // routes
-app.use('/api/auth', authRoutes);
+const apiPrefix = config.apiPrefix || '/api/v1';
+app.use(`${apiPrefix}/auth`, authRoutes);
+app.use(`${apiPrefix}/equipment`, equipmentRoutes);
+app.use(`${apiPrefix}/equipment-categories`, equipmentCategoryRoutes);
 
 // error handler
 app.use(errorHandler);
