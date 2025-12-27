@@ -31,6 +31,8 @@ const MaintenanceRequestForm = () => {
   const [workCenters, setWorkCenters] = useState([])
   const [useWorkCenter, setUseWorkCenter] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
 
   useEffect(() => {
     if (id) {
@@ -43,7 +45,7 @@ const MaintenanceRequestForm = () => {
   const fetchRequest = async () => {
     try {
       const response = await maintenanceAPI.getMaintenanceRequestById(id)
-      const data = response.data
+      const data = response?.data?.data || response?.data || {}
       setFormData(data)
       setUseWorkCenter(!!data.workCenter)
     } catch (error) {
@@ -54,7 +56,8 @@ const MaintenanceRequestForm = () => {
   const fetchEquipment = async () => {
     try {
       const response = await equipmentAPI.getEquipment()
-      setEquipmentList(response.data || [])
+      const list = Array.isArray(response?.data) ? response.data : []
+      setEquipmentList(list)
     } catch (error) {
       console.error('Error fetching equipment:', error)
     }
@@ -63,7 +66,8 @@ const MaintenanceRequestForm = () => {
   const fetchWorkCenters = async () => {
     try {
       const response = await workCenterAPI.getWorkCenters()
-      setWorkCenters(response.data || [])
+      const list = Array.isArray(response?.data) ? response.data : []
+      setWorkCenters(list)
     } catch (error) {
       console.error('Error fetching work centers:', error)
     }
@@ -91,17 +95,41 @@ const MaintenanceRequestForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setErrorMsg('')
+    setSuccessMsg('')
+
+    if (!formData.equipment) {
+      setErrorMsg('Please select equipment before submitting.')
+      return
+    }
+
+    const payload = {
+      subject: formData.subject,
+      description: formData.notes || formData.description || '',
+      requestType: formData.completionType || 'corrective',
+      equipmentId: formData.equipment,
+      scheduledDate: formData.scheduledDate || null,
+      priority: formData.priority || 'medium',
+      duration: formData.duration,
+    }
+
     setLoading(true)
     try {
       if (id) {
-        await maintenanceAPI.updateMaintenanceRequest(id, formData)
+        await maintenanceAPI.updateMaintenanceRequest(id, payload)
       } else {
-        await maintenanceAPI.createMaintenanceRequest(formData)
+        await maintenanceAPI.createMaintenanceRequest(payload)
       }
+      setSuccessMsg('Request saved successfully')
       navigate('/maintenance')
     } catch (error) {
       console.error('Error saving request:', error)
-      alert('Error saving request')
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        'Error saving request'
+      setErrorMsg(message)
     } finally {
       setLoading(false)
     }
@@ -112,6 +140,8 @@ const MaintenanceRequestForm = () => {
       <div className="content">
         <div className="form-card">
           <h1>{id ? 'Edit Maintenance Request' : 'New Maintenance Request'}</h1>
+          {errorMsg && <div className="error-message" style={{ marginBottom: 12 }}>{errorMsg}</div>}
+          {successMsg && <div className="success-message" style={{ marginBottom: 12 }}>{successMsg}</div>}
           <form onSubmit={handleSubmit}>
             <div className="form-grid">
               <div className="form-column">

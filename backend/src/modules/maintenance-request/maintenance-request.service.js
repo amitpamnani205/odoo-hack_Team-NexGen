@@ -226,7 +226,7 @@ export const assignTechnicianService = async (requestId, technicianId) => {
   return updatedRequest;
 };
 
-// Update request stage
+// Update request stage with controlled transitions
 export const updateStageService = async (requestId, newStage, userId) => {
   const request = await MaintenanceRequest.findById(requestId);
   if (!request) {
@@ -235,38 +235,51 @@ export const updateStageService = async (requestId, newStage, userId) => {
     throw err;
   }
 
-  // Check if stage is valid
-  if (newStage !== 'new' && newStage !== 'in_progress' && newStage !== 'repaired' && newStage !== 'scrap') {
+  const validStages = ['new', 'in_progress', 'repaired', 'scrap'];
+  if (!validStages.includes(newStage)) {
     const err = new Error('Invalid stage');
     err.statusCode = 400;
     throw err;
   }
 
-  // Handle stage transitions
-  if (newStage === 'in_progress' && request.stage === 'new') {
+  // Enforce allowed transitions:
+  // new -> in_progress -> repaired
+  // new -> scrap
+  const current = request.stage;
+  const allowed =
+    (current === 'new' && (newStage === 'in_progress' || newStage === 'scrap')) ||
+    (current === 'in_progress' && newStage === 'repaired') ||
+    (current === newStage); // idempotent no-op
+
+  if (!allowed) {
+    const err = new Error('Invalid stage transition');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  if (newStage === current) {
+    return request; // nothing to change
+  }
+
+  if (newStage === 'in_progress') {
     request.stage = 'in_progress';
     request.startDate = new Date();
-    // Auto-assign if not already assigned
     if (!request.assignedTechnicianId) {
       request.assignedTechnicianId = userId;
     }
-  } else if (newStage === 'repaired' && request.stage === 'in_progress') {
+  } else if (newStage === 'repaired') {
     request.stage = 'repaired';
     request.endDate = new Date();
   } else if (newStage === 'scrap') {
     request.stage = 'scrap';
     request.endDate = new Date();
-    
-    // Scrap Logic: Mark equipment as scrapped
+
     const equipment = await Equipment.findById(request.equipmentId);
     if (equipment) {
       equipment.isScrapped = true;
       equipment.scrapDate = new Date();
       await equipment.save();
     }
-  } else {
-    // Allow direct stage updates
-    request.stage = newStage;
   }
 
   await request.save();

@@ -40,7 +40,11 @@ const EquipmentForm = () => {
   const fetchEquipment = async () => {
     try {
       const response = await equipmentAPI.getEquipmentById(id)
-      setFormData(response.data)
+      const data = response?.data?.data || response?.data || {}
+      setFormData(prev => ({
+        ...prev,
+        ...data
+      }))
     } catch (error) {
       console.error('Error fetching equipment:', error)
     }

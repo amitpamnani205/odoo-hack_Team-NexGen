@@ -32,45 +32,37 @@ export const AuthProvider = ({ children }) => {
     setLoading(false)
   }, [])
 
-  const login = async (userId, password) => {
+  const login = async (email, password) => {
     try {
-      const response = await authAPI.login(userId, password)
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data.user))
-      setUser(response.data.user)
-      return { success: true }
-    } catch (error) {
-      // Even if API fails, create mock user for frontend testing
-      const mockUser = {
-        id: '1',
-        name: userId || 'User',
-        email: userId + '@example.com'
+      const response = await authAPI.login(email, password)
+      const userData = response?.data?.data || response?.data?.user || response?.data
+      const token = response?.data?.token || 'session-cookie'
+      if (userData) {
+        localStorage.setItem('token', token)
+        localStorage.setItem('user', JSON.stringify(userData))
+        setUser(userData)
+        return { success: true }
       }
-      localStorage.setItem('token', 'mock-token')
-      localStorage.setItem('user', JSON.stringify(mockUser))
-      setUser(mockUser)
-      return { success: true }
+      return { success: false, error: 'Invalid login response' }
+    } catch (error) {
+      return { success: false, error: error?.response?.data?.message || 'Login failed' }
     }
   }
 
-  const signup = async (name, email, password) => {
+  const signup = async (name, email, password, role) => {
     try {
-      const response = await authAPI.signup(name, email, password)
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data.user))
-      setUser(response.data.user)
-      return { success: true }
-    } catch (error) {
-      // Even if API fails, create mock user for frontend testing
-      const mockUser = {
-        id: '1',
-        name: name,
-        email: email
+      const response = await authAPI.signup(name, email, password, role)
+      const userData = response?.data?.data || response?.data?.user || response?.data
+      const token = response?.data?.token || 'session-cookie'
+      if (userData) {
+        localStorage.setItem('token', token)
+        localStorage.setItem('user', JSON.stringify(userData))
+        setUser(userData)
+        return { success: true }
       }
-      localStorage.setItem('token', 'mock-token')
-      localStorage.setItem('user', JSON.stringify(mockUser))
-      setUser(mockUser)
-      return { success: true }
+      return { success: false, error: 'Invalid signup response' }
+    } catch (error) {
+      return { success: false, error: error?.response?.data?.message || 'Signup failed' }
     }
   }
 

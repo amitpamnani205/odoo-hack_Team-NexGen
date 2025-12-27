@@ -22,7 +22,12 @@ const MaintenanceTeamForm = () => {
   const fetchTeam = async () => {
     try {
       const response = await teamAPI.getTeamById(id)
-      setFormData(response.data)
+      const data = response?.data?.data || response?.data || {}
+      setFormData({
+        name: data.name || '',
+        description: data.description || '',
+        members: data.teamMembers || data.members || []
+      })
     } catch (error) {
       console.error('Error fetching team:', error)
     }

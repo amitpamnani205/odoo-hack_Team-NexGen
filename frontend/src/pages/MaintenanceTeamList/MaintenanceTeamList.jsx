@@ -15,7 +15,8 @@ const MaintenanceTeamList = () => {
   const fetchTeams = async () => {
     try {
       const response = await teamAPI.getTeams()
-      setTeams(response.data || [])
+      const data = Array.isArray(response?.data) ? response.data : []
+      setTeams(data)
     } catch (error) {
       console.error('Error fetching teams:', error)
     } finally {

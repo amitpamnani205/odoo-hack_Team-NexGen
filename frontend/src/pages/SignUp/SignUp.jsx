@@ -8,6 +8,7 @@ const SignUp = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rePassword, setRePassword] = useState('')
+  const [role, setRole] = useState('user')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { signup } = useAuth()
@@ -23,7 +24,7 @@ const SignUp = () => {
     }
 
     setLoading(true)
-    const result = await signup(name, email, password)
+    const result = await signup(name, email, password, role)
     setLoading(false)
 
     if (result.success) {
@@ -78,6 +79,19 @@ const SignUp = () => {
               onChange={(e) => setRePassword(e.target.value)}
               required
             />
+          </div>
+          <div className="form-group">
+            <label htmlFor="role">Role</label>
+            <select
+              id="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              required
+            >
+              <option value="user">User</option>
+              <option value="manager">Manager</option>
+              <option value="admin">Admin</option>
+            </select>
           </div>
           {error && <div className="error-message">{error}</div>}
           <button type="submit" className="btn-primary" disabled={loading}>

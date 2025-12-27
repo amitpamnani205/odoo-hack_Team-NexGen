@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import './Login.css'
 
 const Login = () => {
-  const [userId, setUserId] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -16,13 +16,13 @@ const Login = () => {
     setError('')
     setLoading(true)
 
-    const result = await login(userId, password)
+    const result = await login(email, password)
     setLoading(false)
 
     if (result.success) {
       navigate('/dashboard')
     } else {
-      setError(result.error)
+      setError(result.error || 'Login failed')
     }
   }
 
@@ -33,12 +33,13 @@ const Login = () => {
         <h2>Sign In</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="userId">User ID</label>
+            <label htmlFor="email">Email</label>
             <input
-              type="text"
-              id="userId"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="name@company.com"
               required
             />
           </div>
@@ -49,6 +50,7 @@ const Login = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
               required
             />
           </div>
@@ -57,7 +59,7 @@ const Login = () => {
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
           <div className="form-links">
-            <Link to="/signup">Sign Up</Link>
+            <Link to="/signup">Need an account? Sign Up</Link>
             <Link to="/forgot-password">Forgot Password?</Link>
           </div>
         </form>

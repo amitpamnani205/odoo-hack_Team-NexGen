@@ -20,13 +20,26 @@ const Dashboard = () => {
   const fetchData = async () => {
     try {
       const response = await maintenanceAPI.getMaintenanceRequests()
-      const data = response.data || []
-      setRequests(data.slice(0, 4))
+      // Backend wraps data as { success, message, data: [...] }
+      const raw = Array.isArray(response?.data?.data)
+        ? response.data.data
+        : Array.isArray(response?.data)
+          ? response.data
+          : []
+
+      const normalized = raw.map((r) => ({
+        ...r,
+        completionType: r.completionType || r.requestType,
+        assignedTo: r.assignedTo || r.assignedTechnicianId,
+        requestDate: r.requestDate || r.createdAt,
+      }))
+
+      setRequests(normalized.slice(0, 4))
       
       // Calculate stats
-      const newCount = data.filter(r => r.stage === 'new').length
-      const inProgressCount = data.filter(r => r.stage === 'in_progress').length
-      const completedCount = data.filter(r => r.stage === 'repaired').length
+      const newCount = normalized.filter(r => r.stage === 'new').length
+      const inProgressCount = normalized.filter(r => r.stage === 'in_progress').length
+      const completedCount = normalized.filter(r => r.stage === 'repaired').length
       
       setStats({
         new: newCount,

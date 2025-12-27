@@ -1,77 +1,36 @@
 import api from './auth.api'
 
-// Mock data for frontend testing
-const mockEquipment = [
-  { _id: '1', name: 'Air Compressor', department: 'Production', workCenter: { name: 'Assembly 1' }, technician: { name: 'John Carter' }, category: { name: 'Machinery' } },
-  { _id: '2', name: 'Pump 1', department: 'Maintenance', workCenter: { name: 'Drill 1' }, technician: { name: 'Ravi Kumar' }, category: { name: 'Pumps' } },
-  { _id: '3', name: 'Motor', department: 'Production', workCenter: { name: 'Assembly 1' }, technician: { name: 'Ashok Mehta' }, category: { name: 'Electrical' } }
-]
-
-const mockCategories = [
-  { _id: '1', name: 'Computers', responsible: 'OdooBot', company: 'My Company (San Francisco)' },
-  { _id: '2', name: 'Software', responsible: 'OdooBot', company: 'My Company (San Francisco)' },
-  { _id: '3', name: 'Monitors', responsible: 'Mitchell Admin', company: 'My Company (San Francisco)' }
-]
+const unwrapList = (res) =>
+  Array.isArray(res?.data?.data) ? res.data.data : res?.data || []
 
 export const getEquipment = async () => {
-  try {
-    const response = await api.get('/equipment')
-    return response
-  } catch (error) {
-    return { data: mockEquipment }
-  }
-}
-
-export const getEquipmentById = async (id) => {
-  try {
-    const response = await api.get(`/equipment/${id}`)
-    return response
-  } catch (error) {
-    return { data: mockEquipment.find(eq => eq._id === id) || mockEquipment[0] }
-  }
+  const res = await api.get('/equipment')
+  return { data: unwrapList(res) }
 }
 
 export const createEquipment = async (data) => {
-  try {
-    const response = await api.post('/equipment', data)
-    return response
-  } catch (error) {
-    return { data: { ...data, _id: Date.now().toString() } }
-  }
+  const res = await api.post('/equipment', data)
+  return { data: res?.data?.data || res?.data }
 }
 
-export const updateEquipment = async (id, data) => {
-  try {
-    const response = await api.put(`/equipment/${id}`, data)
-    return response
-  } catch (error) {
-    return { data: { ...data, _id: id } }
-  }
+// Backend currently exposes only list/create; add by-id handlers when backend supports them
+export const getEquipmentCategories = async () => {
+  const res = await api.get('/equipment-categories')
+  return { data: unwrapList(res) }
+}
+
+export const getEquipmentById = async (id) => {
+  const res = await api.get(`/equipment/${id}`)
+  return { data: res?.data?.data || res?.data }
+}
+
+export const updateEquipment = async (id, payload) => {
+  const res = await api.put(`/equipment/${id}`, payload)
+  return { data: res?.data?.data || res?.data }
 }
 
 export const deleteEquipment = async (id) => {
-  try {
-    return await api.delete(`/equipment/${id}`)
-  } catch (error) {
-    return { data: { success: true } }
-  }
-}
-
-export const getEquipmentCategories = async () => {
-  try {
-    const response = await api.get('/equipment/categories')
-    return response
-  } catch (error) {
-    return { data: mockCategories }
-  }
-}
-
-export const getEquipmentByEquipment = async (equipmentId) => {
-  try {
-    const response = await api.get(`/equipment/${equipmentId}/requests`)
-    return response
-  } catch (error) {
-    return { data: [] }
-  }
+  const res = await api.delete(`/equipment/${id}`)
+  return { data: res?.data?.data || res?.data }
 }
 

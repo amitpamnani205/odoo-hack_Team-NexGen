@@ -65,6 +65,26 @@
   border-color: var(--primary-purple);
 }
 
+.success-message {
+  color: #0f8a47;
+  font-size: 14px;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: #e8f5ed;
+  border-radius: 4px;
+  border: 1px solid #b7e2c6;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: #f8d7da;
+  border-radius: 4px;
+  border: 1px solid #f1aeb5;
+}
+
 .form-group input[type="checkbox"] {
   width: auto;
   cursor: pointer;
