@@ -1,0 +1,105 @@
+:root {
+  --primary: #7066F0;
+  --accent: #54D1F1;
+  --soft-bg: #F7F7FF;
+  --text: #4D4D4D;
+  --white: #FFFFFF;
+  --purple: var(--primary);
+}
+
+.teams-page {
+  min-height: 100vh;
+  background: var(--soft-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: Inter, sans-serif;
+}
+
+.app-window {
+  width: 100%;
+  max-width: 1500px;
+  background: var(--white);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  padding: 32px;
+  min-height: 850px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #E6E6F0;
+}
+
+.header h2 {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 22px;
+}
+
+.new-btn {
+  border-radius: 10px;
+  border: none;
+  background: var(--primary);
+  color: var(--white);
+  cursor: pointer;
+  padding: 10px 20px;
+  font-size: 15px;
+}
+
+.new-btn:hover {
+  opacity: 0.9;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  text-align: left;
+  color: var(--text);
+  padding: 18px 12px;
+  font-size: 15px;
+}
+
+thead {
+  border-bottom: 1px solid #E6E6F0;
+}
+
+tbody tr {
+  cursor: pointer;
+}
+
+tbody tr:hover {
+  background: var(--soft-bg);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  table, tbody, tr, td {
+    display: block;
+  }
+  
+  thead {
+    display: none;
+  }
+
+  tr {
+    background: var(--soft-bg);
+    margin-bottom: 12px;
+    border-radius: 12px;
+    padding: 16px;
+  }
+}
+

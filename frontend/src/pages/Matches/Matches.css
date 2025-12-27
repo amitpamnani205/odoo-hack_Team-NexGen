@@ -1,0 +1,14 @@
+.matches-page {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.matches-page h1 {
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
